@@ -14,13 +14,164 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      locations: {
+        Row: {
+          address: string
+          capacity_kg: number
+          created_at: string
+          current_weight_kg: number
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          status: string | null
+        }
+        Insert: {
+          address: string
+          capacity_kg: number
+          created_at?: string
+          current_weight_kg?: number
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          status?: string | null
+        }
+        Update: {
+          address?: string
+          capacity_kg?: number
+          created_at?: string
+          current_weight_kg?: number
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          points: number
+          unique_code: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id: string
+          points?: number
+          unique_code: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          points?: number
+          unique_code?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          created_at: string
+          id: string
+          location_id: string | null
+          points_earned: number
+          user_id: string
+          waste_type: string
+          weight_kg: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_id?: string | null
+          points_earned: number
+          user_id: string
+          waste_type: string
+          weight_kg: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_id?: string | null
+          points_earned?: number
+          user_id?: string
+          waste_type?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      withdrawals: {
+        Row: {
+          amount_naira: number
+          created_at: string
+          id: string
+          points_deducted: number
+          processed_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_naira: number
+          created_at?: string
+          id?: string
+          points_deducted: number
+          processed_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_naira?: number
+          created_at?: string
+          id?: string
+          points_deducted?: number
+          processed_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_unique_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
