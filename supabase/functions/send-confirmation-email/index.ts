@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     `
 
     const { data, error } = await resend.emails.send({
-      from: 'Trash to Cash <noreply@yourdomain.com>', // Replace with your verified domain
+      from: 'Trash to Cash <onboarding@resend.dev>', // Free test email - no domain verification needed
       to: [user.email],
       subject: 'Confirm your Trash to Cash account',
       html,
