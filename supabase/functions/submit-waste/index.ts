@@ -8,7 +8,6 @@ const corsHeaders = {
 
 interface WasteSubmission {
   unique_code: string;
-  waste_type: 'metal' | 'non-metal';
   weight_kg: number;
   location_id?: string;
 }
@@ -25,28 +24,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { unique_code, waste_type, weight_kg, location_id }: WasteSubmission = await req.json();
+    const { unique_code, weight_kg, location_id }: WasteSubmission = await req.json();
 
-    console.log('Received waste submission:', { unique_code, waste_type, weight_kg, location_id });
+    console.log('Received waste submission:', { unique_code, weight_kg, location_id });
 
     // Validate input
-    if (!unique_code || !waste_type || !weight_kg) {
+    if (!unique_code || weight_kg === undefined || weight_kg === null) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: unique_code, waste_type, weight_kg' }),
+        JSON.stringify({ error: 'Missing required fields: unique_code, weight_kg' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (waste_type !== 'metal' && waste_type !== 'non-metal') {
+    if (weight_kg < 0) {
       return new Response(
-        JSON.stringify({ error: 'Invalid waste_type. Must be "metal" or "non-metal"' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    if (weight_kg <= 0) {
-      return new Response(
-        JSON.stringify({ error: 'Weight must be greater than 0' }),
+        JSON.stringify({ error: 'Weight cannot be negative' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -68,13 +60,13 @@ serve(async (req) => {
 
     console.log('Found profile:', profile);
 
-    // Calculate points
-    // Metal: 5 points per kg
-    // Non-metal: 2 points per kg
-    const pointsPerKg = waste_type === 'metal' ? 5 : 2;
-    const points_earned = weight_kg * pointsPerKg;
+    // Determine if submission is valid (weight > 0.1 kg)
+    const is_valid = weight_kg > 0.1;
+    
+    // Calculate points - only if valid (3 points per kg)
+    const points_earned = is_valid ? weight_kg * 3 : 0;
 
-    console.log('Points calculation:', { pointsPerKg, points_earned });
+    console.log('Points calculation:', { is_valid, points_earned, weight_kg });
 
     // Create transaction
     const { data: transaction, error: transactionError } = await supabaseClient
@@ -82,7 +74,7 @@ serve(async (req) => {
       .insert({
         user_id: profile.id,
         location_id: location_id || null,
-        waste_type,
+        is_valid,
         weight_kg,
         points_earned,
       })
@@ -149,10 +141,11 @@ serve(async (req) => {
             full_name: profile.full_name,
             username: profile.username,
           },
-          waste_type,
+          is_valid,
           weight_kg,
           points_earned,
           new_balance: new_points,
+          message: is_valid ? 'Waste accepted! Points credited.' : 'Weight too low (< 0.1kg). No points awarded.'
         },
       }),
       {

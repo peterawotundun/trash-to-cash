@@ -22,6 +22,7 @@ const Auth = () => {
   const [signupPassword, setSignupPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -73,6 +74,7 @@ const Auth = () => {
           data: {
             full_name: fullName,
             username: username,
+            phone_number: phoneNumber,
           },
         },
       });
@@ -155,6 +157,17 @@ const Auth = () => {
                     placeholder="johndoe"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone-number">Phone Number (Your Unique ID)</Label>
+                  <Input
+                    id="phone-number"
+                    type="tel"
+                    placeholder="08012345678"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     required
                   />
                 </div>

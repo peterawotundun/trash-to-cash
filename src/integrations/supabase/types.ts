@@ -84,28 +84,28 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_valid: boolean
           location_id: string | null
           points_earned: number
           user_id: string
-          waste_type: string
           weight_kg: number
         }
         Insert: {
           created_at?: string
           id?: string
+          is_valid?: boolean
           location_id?: string | null
           points_earned: number
           user_id: string
-          waste_type: string
           weight_kg: number
         }
         Update: {
           created_at?: string
           id?: string
+          is_valid?: boolean
           location_id?: string | null
           points_earned?: number
           user_id?: string
-          waste_type?: string
           weight_kg?: number
         }
         Relationships: [

@@ -11,7 +11,7 @@ import { format } from "date-fns";
 
 interface Transaction {
   id: string;
-  waste_type: string;
+  is_valid: boolean;
   weight_kg: number;
   points_earned: number;
   created_at: string;
@@ -121,8 +121,8 @@ const History = () => {
                       className="flex items-center justify-between p-4 rounded-lg bg-muted/50"
                     >
                       <div>
-                        <p className="font-semibold capitalize">
-                          {transaction.waste_type.replace("-", " ")}
+                        <p className="font-semibold">
+                          Waste Deposit {transaction.is_valid ? '✓' : '✗'}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {format(new Date(transaction.created_at), "MMM dd, yyyy 'at' h:mm a")}
@@ -130,6 +130,11 @@ const History = () => {
                         <p className="text-sm text-muted-foreground">
                           Weight: {transaction.weight_kg} kg
                         </p>
+                        {!transaction.is_valid && (
+                          <p className="text-xs text-red-500 mt-1">
+                            Below minimum weight (0.1kg)
+                          </p>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="text-xl font-bold text-green-600 dark:text-green-400">
