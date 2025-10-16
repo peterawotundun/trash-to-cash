@@ -60,8 +60,8 @@ serve(async (req) => {
 
     console.log('Found profile:', profile);
 
-    // Determine if submission is valid (weight > 0.1 kg)
-    const is_valid = weight_kg > 0.1;
+    // Determine if submission is valid (weight > 0.001 kg)
+    const is_valid = weight_kg > 0.001;
     
     // Calculate points - only if valid (50 points per kg = ₦200 per kg)
     const points_earned = is_valid ? weight_kg * 50 : 0;
@@ -145,7 +145,7 @@ serve(async (req) => {
           weight_kg,
           points_earned,
           new_balance: new_points,
-          message: is_valid ? 'Waste accepted! Points credited.' : 'Weight too low (< 0.1kg). No points awarded.'
+          message: is_valid ? 'Waste accepted! Points credited.' : 'Weight too low (< 0.001kg). No points awarded.'
         },
       }),
       {
