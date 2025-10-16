@@ -2,7 +2,9 @@ import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { Resend } from 'https://esm.sh/resend@4.0.0'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string)
-const hookSecret = Deno.env.get('SEND_CONFIRMATION_EMAIL_HOOK_SECRET') as string
+// Strip the 'v1,' prefix if present, as standardwebhooks expects just the secret part
+const rawSecret = Deno.env.get('SEND_CONFIRMATION_EMAIL_HOOK_SECRET') as string
+const hookSecret = rawSecret.startsWith('v1,') ? rawSecret.substring(3) : rawSecret
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
