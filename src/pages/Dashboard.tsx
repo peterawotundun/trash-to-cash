@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     checkUser();
@@ -102,7 +103,13 @@ const Dashboard = () => {
 
       toast.success("Withdrawal request submitted!");
       setWithdrawAmount("");
+      setDialogOpen(false);
       fetchProfile();
+      
+      // Redirect to transaction history
+      setTimeout(() => {
+        navigate("/history");
+      }, 500);
     } catch (error: any) {
       toast.error("Failed to process withdrawal");
       console.error(error);
@@ -197,7 +204,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <Dialog>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="w-full gap-2">
                   <TrendingUp className="h-4 w-4" />
