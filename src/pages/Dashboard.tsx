@@ -73,7 +73,7 @@ const Dashboard = () => {
       return;
     }
 
-    const pointsNeeded = amount * 10; // ₦1 = 10 points
+    const pointsNeeded = amount * 0.25; // ₦1 = 0.25 points (50 points = ₦200)
     if (pointsNeeded > profile.points) {
       toast.error("Insufficient points");
       return;
@@ -111,7 +111,7 @@ const Dashboard = () => {
     }
   };
 
-  const nairaBalance = profile ? (profile.points / 10).toFixed(2) : "0.00";
+  const nairaBalance = profile ? (profile.points * 4).toFixed(2) : "0.00";
 
   if (loading) {
     return (
@@ -186,7 +186,7 @@ const Dashboard = () => {
               Withdraw Funds
             </CardTitle>
             <CardDescription>
-              Convert your points to cash (₦1 = 10 points)
+              Convert your points to cash (50 points = ₦200)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -224,7 +224,7 @@ const Dashboard = () => {
                       step="0.01"
                     />
                     <p className="text-sm text-muted-foreground">
-                      Points needed: {(parseFloat(withdrawAmount) * 10) || 0}
+                      Points needed: {(parseFloat(withdrawAmount) * 0.25).toFixed(2) || 0}
                     </p>
                   </div>
                   <Button

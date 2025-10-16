@@ -114,7 +114,7 @@ const Index = () => {
             <div>
               <h3 className="font-semibold text-lg mb-1">Withdraw Cash</h3>
               <p className="text-muted-foreground">
-                Convert your points to cash (₦1 = 10 points) and request withdrawal anytime.
+                Convert your points to cash (50 points = ₦200) and request withdrawal anytime.
               </p>
             </div>
           </div>

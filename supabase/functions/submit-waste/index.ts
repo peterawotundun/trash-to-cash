@@ -63,8 +63,8 @@ serve(async (req) => {
     // Determine if submission is valid (weight > 0.1 kg)
     const is_valid = weight_kg > 0.1;
     
-    // Calculate points - only if valid (3 points per kg)
-    const points_earned = is_valid ? weight_kg * 3 : 0;
+    // Calculate points - only if valid (50 points per kg = ₦200 per kg)
+    const points_earned = is_valid ? weight_kg * 50 : 0;
 
     console.log('Points calculation:', { is_valid, points_earned, weight_kg });
 
