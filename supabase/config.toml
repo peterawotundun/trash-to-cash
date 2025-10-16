@@ -2,3 +2,6 @@ project_id = "nkrirpjmixfrunhmrawz"
 
 [functions.submit-waste]
 verify_jwt = false
+
+[functions.send-confirmation-email]
+verify_jwt = false
