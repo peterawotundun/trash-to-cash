@@ -8,6 +8,15 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Enable SPA fallback for client-side routing
+    open: true,
+    historyApiFallback: true,
+  },
+  preview: {
+    port: 8080,
+    // Enable SPA fallback for preview mode
+    open: true,
+    historyApiFallback: true,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
