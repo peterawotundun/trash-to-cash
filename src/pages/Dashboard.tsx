@@ -135,12 +135,12 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-background dark:to-green-950">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-green-800 dark:text-green-400">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-green-800 dark:text-green-400">
           Welcome, {profile?.full_name}!
         </h1>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8">
           <Card className="hover-scale">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Full Name</CardTitle>
@@ -186,7 +186,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <Card className="max-w-2xl">
+        <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wallet className="h-5 w-5" />

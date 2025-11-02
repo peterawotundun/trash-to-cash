@@ -83,10 +83,10 @@ const Leaderboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-background dark:to-green-950">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <Trophy className="h-8 w-8 text-green-600 dark:text-green-400" />
-          <h1 className="text-3xl font-bold text-green-800 dark:text-green-400">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
+          <Trophy className="h-6 w-6 md:h-8 md:w-8 text-green-600 dark:text-green-400" />
+          <h1 className="text-2xl md:text-3xl font-bold text-green-800 dark:text-green-400">
             Top Recyclers
           </h1>
         </div>
@@ -96,33 +96,33 @@ const Leaderboard = () => {
             <CardTitle>Leaderboard</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               {entries.map((entry, index) => (
                 <div
                   key={entry.id}
-                  className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-lg transition-colors ${
                     index < 3
                       ? "bg-green-50 dark:bg-green-950"
                       : "hover:bg-muted/50"
                   }`}
                 >
-                  <div className="flex items-center justify-center w-10">
+                  <div className="flex items-center justify-center w-8 md:w-10">
                     {getRankIcon(index + 1)}
                   </div>
 
-                  <Avatar>
-                    <AvatarFallback className="bg-green-600 text-white">
+                  <Avatar className="h-8 w-8 md:h-10 md:w-10">
+                    <AvatarFallback className="bg-green-600 text-white text-xs md:text-sm">
                       {getInitials(entry.full_name)}
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="flex-1">
-                    <p className="font-semibold">{entry.full_name}</p>
-                    <p className="text-sm text-muted-foreground">@{entry.username}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm md:text-base truncate">{entry.full_name}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground truncate">@{entry.username}</p>
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <div className="text-right shrink-0">
+                    <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                       {entry.points.toFixed(0)}
                     </p>
                     <p className="text-xs text-muted-foreground">points</p>

@@ -91,16 +91,16 @@ const History = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-background dark:to-green-950">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <HistoryIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
-          <h1 className="text-3xl font-bold text-green-800 dark:text-green-400">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
+          <HistoryIcon className="h-6 w-6 md:h-8 md:w-8 text-green-600 dark:text-green-400" />
+          <h1 className="text-2xl md:text-3xl font-bold text-green-800 dark:text-green-400">
             Transaction History
           </h1>
         </div>
 
         <Tabs defaultValue="deposits" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto">
             <TabsTrigger value="deposits">Deposits</TabsTrigger>
             <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
           </TabsList>
@@ -118,10 +118,10 @@ const History = () => {
                   {transactions.map((transaction) => (
                     <div
                       key={transaction.id}
-                      className="flex items-center justify-between p-4 rounded-lg bg-muted/50"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 md:p-4 rounded-lg bg-muted/50"
                     >
-                      <div>
-                        <p className="font-semibold">
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm md:text-base">
                           Waste Deposit {transaction.is_valid ? '✓' : '✗'}
                         </p>
                         <p className="text-sm text-muted-foreground">
@@ -136,8 +136,8 @@ const History = () => {
                           </p>
                         )}
                       </div>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                      <div className="text-left sm:text-right">
+                        <p className="text-lg md:text-xl font-bold text-green-600 dark:text-green-400">
                           +{transaction.points_earned}
                         </p>
                         <p className="text-xs text-muted-foreground">points</p>
@@ -168,10 +168,10 @@ const History = () => {
                   {withdrawals.map((withdrawal) => (
                     <div
                       key={withdrawal.id}
-                      className="flex items-center justify-between p-4 rounded-lg bg-muted/50"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 md:p-4 rounded-lg bg-muted/50"
                     >
-                      <div>
-                        <p className="font-semibold">
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm md:text-base">
                           ₦{withdrawal.amount_naira.toFixed(2)}
                         </p>
                         <p className="text-sm text-muted-foreground">

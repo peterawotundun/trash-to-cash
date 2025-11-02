@@ -78,12 +78,12 @@ const Locations = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-background dark:to-green-950">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-green-800 dark:text-green-400">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-green-800 dark:text-green-400">
           Recycling Locations
         </h1>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {locations.map((location) => (
             <Card key={location.id} className="hover-scale">
               <CardHeader>
