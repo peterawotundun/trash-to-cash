@@ -14,10 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          address: string
+          contact_person: string
+          created_at: string
+          description: string | null
+          email: string
+          id: string
+          name: string
+          phone: string
+          registration_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          contact_person: string
+          created_at?: string
+          description?: string | null
+          email: string
+          id?: string
+          name: string
+          phone: string
+          registration_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          contact_person?: string
+          created_at?: string
+          description?: string | null
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          registration_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           address: string
           capacity_kg: number
+          company_id: string | null
           created_at: string
           current_weight_kg: number
           id: string
@@ -29,6 +69,7 @@ export type Database = {
         Insert: {
           address: string
           capacity_kg: number
+          company_id?: string | null
           created_at?: string
           current_weight_kg?: number
           id?: string
@@ -40,6 +81,7 @@ export type Database = {
         Update: {
           address?: string
           capacity_kg?: number
+          company_id?: string | null
           created_at?: string
           current_weight_kg?: number
           id?: string
@@ -48,7 +90,15 @@ export type Database = {
           name?: string
           status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "locations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -125,6 +175,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       withdrawals: {
         Row: {
           amount_naira: number
@@ -168,13 +239,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_unique_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
+      generate_unique_code: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -301,6 +376,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
-import { Home, MapPin, Trophy, History, LogOut, Recycle, Menu } from "lucide-react";
+import { Home, MapPin, Trophy, History, LogOut, Recycle, Menu, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 
 const Navigation = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin } = useAdminCheck();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -104,6 +106,24 @@ const Navigation = () => {
                   )}
                 </NavLink>
 
+                {isAdmin && (
+                  <NavLink to="/admin" onClick={() => setIsOpen(false)}>
+                    {({ isActive }) => (
+                      <Button
+                        variant="ghost"
+                        className={`w-full justify-start gap-2 ${
+                          isActive
+                            ? "bg-green-700 dark:bg-green-800 text-white"
+                            : "text-green-50 hover:bg-green-700 dark:hover:bg-green-800"
+                        }`}
+                      >
+                        <Shield className="h-4 w-4" />
+                        Admin
+                      </Button>
+                    )}
+                  </NavLink>
+                )}
+
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-2 text-green-50 hover:bg-green-700 dark:hover:bg-green-800"
@@ -181,6 +201,24 @@ const Navigation = () => {
                 </Button>
               )}
             </NavLink>
+
+            {isAdmin && (
+              <NavLink to="/admin">
+                {({ isActive }) => (
+                  <Button
+                    variant="ghost"
+                    className={`gap-2 ${
+                      isActive
+                        ? "bg-green-700 dark:bg-green-800 text-white"
+                        : "text-green-50 hover:bg-green-700 dark:hover:bg-green-800"
+                    }`}
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Button>
+                )}
+              </NavLink>
+            )}
 
             <Button
               variant="ghost"

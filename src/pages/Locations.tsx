@@ -16,6 +16,13 @@ interface Location {
   current_weight_kg: number;
   latitude: number | null;
   longitude: number | null;
+  company_id: string | null;
+  companies?: {
+    name: string;
+    contact_person: string;
+    phone: string;
+    email: string;
+  } | null;
 }
 
 const Locations = () => {
@@ -42,7 +49,15 @@ const Locations = () => {
     try {
       const { data, error } = await supabase
         .from("locations")
-        .select("*")
+        .select(`
+          *,
+          companies (
+            name,
+            contact_person,
+            phone,
+            email
+          )
+        `)
         .order("name");
 
       if (error) throw error;
@@ -94,6 +109,19 @@ const Locations = () => {
                       {location.name}
                     </CardTitle>
                     <CardDescription className="mt-2">{location.address}</CardDescription>
+                    {location.companies && (
+                      <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+                        <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                          {location.companies.name}
+                        </p>
+                        <p className="text-xs text-green-700 dark:text-green-400">
+                          Contact: {location.companies.contact_person}
+                        </p>
+                        <p className="text-xs text-green-700 dark:text-green-400">
+                          {location.companies.phone}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <Badge variant={location.status === "available" ? "default" : "destructive"}>
                     {location.status}
