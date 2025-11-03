@@ -31,8 +31,9 @@ This endpoint is used by smart recycling bins to submit waste deposits and autom
 
 #### Points Calculation
 
-- **Metal waste:** 5 points per kg
-- **Non-metal waste:** 2 points per kg
+- **All waste:** 10,000 points per kg (0.0001kg = 1 point)
+- **Minimum threshold:** 0.0001kg
+- **Conversion rate:** 1 point = ₦1
 
 #### Response (Success)
 
@@ -150,8 +151,8 @@ When a location reaches its maximum capacity:
 
 Users can withdraw their earnings:
 
-- **Conversion Rate:** ₦1 = 10 points
-- **Minimum Withdrawal:** ₦50 (500 points)
+- **Conversion Rate:** 1 point = ₦1
+- **Minimum Withdrawal:** ₦50 (50 points)
 - **Status:** pending → completed/failed
 
 ## Database Schema

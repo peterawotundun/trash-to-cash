@@ -132,7 +132,7 @@ const History = () => {
                         </p>
                         {!transaction.is_valid && (
                           <p className="text-xs text-red-500 mt-1">
-                            Below minimum weight (0.1kg)
+                            Below minimum weight (0.0001kg)
                           </p>
                         )}
                       </div>
