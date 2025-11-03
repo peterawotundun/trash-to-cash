@@ -54,6 +54,3 @@ This project is built with:
 ## How can I deploy this project?
 
 I deployed this project using vercel
-
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
