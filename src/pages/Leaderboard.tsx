@@ -36,10 +36,11 @@ const Leaderboard = () => {
 
   const fetchLeaderboard = async () => {
     try {
-      // Fetch profiles excluding admins
+      // Fetch profiles excluding admins and unregistered users
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, username, full_name, points")
+        .select("id, username, full_name, points, is_registered")
+        .eq("is_registered", true) // Only show fully registered users
         .order("points", { ascending: false });
 
       if (profilesError) throw profilesError;
