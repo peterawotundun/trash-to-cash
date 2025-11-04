@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Building2, Users, Package, Wallet, Plus } from "lucide-react";
+import { Building2, Users, Package, Wallet, Plus, MapPin, Edit, Trash2 } from "lucide-react";
 
 interface Company {
   id: string;
@@ -45,6 +45,20 @@ interface Withdrawal {
   profiles: { full_name: string; username: string } | null;
 }
 
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+  company_id: string | null;
+  capacity_kg: number;
+  current_weight_kg: number;
+  status: string;
+  latitude: number | null;
+  longitude: number | null;
+  created_at: string;
+  companies?: { name: string } | null;
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -52,6 +66,8 @@ const Admin = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalTransactions: 0,
@@ -67,6 +83,17 @@ const Admin = () => {
     registration_number: "",
     contact_person: "",
     description: "",
+  });
+
+  const [locationForm, setLocationForm] = useState({
+    name: "",
+    address: "",
+    company_id: "",
+    capacity_kg: "",
+    current_weight_kg: "0",
+    status: "available",
+    latitude: "",
+    longitude: "",
   });
 
   useEffect(() => {
@@ -99,6 +126,7 @@ const Admin = () => {
         fetchCompanies(),
         fetchTransactions(),
         fetchWithdrawals(),
+        fetchLocations(),
         fetchStats(),
       ]);
     } catch (error) {
@@ -175,6 +203,23 @@ const Admin = () => {
     }
   };
 
+  const fetchLocations = async () => {
+    const { data, error } = await supabase
+      .from("locations")
+      .select(`
+        *,
+        companies (name)
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching locations:", error);
+      toast.error("Failed to load locations");
+    } else {
+      setLocations(data || []);
+    }
+  };
+
   const handleCompanySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -211,6 +256,98 @@ const Admin = () => {
       fetchWithdrawals();
       fetchStats();
     }
+  };
+
+  const handleLocationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const locationData = {
+      name: locationForm.name,
+      address: locationForm.address,
+      company_id: locationForm.company_id || null,
+      capacity_kg: parseFloat(locationForm.capacity_kg),
+      current_weight_kg: parseFloat(locationForm.current_weight_kg),
+      status: locationForm.status,
+      latitude: locationForm.latitude ? parseFloat(locationForm.latitude) : null,
+      longitude: locationForm.longitude ? parseFloat(locationForm.longitude) : null,
+    };
+
+    if (editingLocation) {
+      const { error } = await supabase
+        .from("locations")
+        .update(locationData)
+        .eq("id", editingLocation.id);
+
+      if (error) {
+        toast.error("Failed to update location");
+        console.error(error);
+      } else {
+        toast.success("Location updated successfully");
+        setEditingLocation(null);
+        resetLocationForm();
+        fetchLocations();
+      }
+    } else {
+      const { error } = await supabase.from("locations").insert([locationData]);
+
+      if (error) {
+        toast.error("Failed to add location");
+        console.error(error);
+      } else {
+        toast.success("Location added successfully");
+        resetLocationForm();
+        fetchLocations();
+      }
+    }
+  };
+
+  const resetLocationForm = () => {
+    setLocationForm({
+      name: "",
+      address: "",
+      company_id: "",
+      capacity_kg: "",
+      current_weight_kg: "0",
+      status: "available",
+      latitude: "",
+      longitude: "",
+    });
+  };
+
+  const handleEditLocation = (location: Location) => {
+    setEditingLocation(location);
+    setLocationForm({
+      name: location.name,
+      address: location.address,
+      company_id: location.company_id || "",
+      capacity_kg: location.capacity_kg.toString(),
+      current_weight_kg: location.current_weight_kg.toString(),
+      status: location.status,
+      latitude: location.latitude?.toString() || "",
+      longitude: location.longitude?.toString() || "",
+    });
+  };
+
+  const handleDeleteLocation = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this location?")) return;
+
+    const { error } = await supabase
+      .from("locations")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to delete location");
+      console.error(error);
+    } else {
+      toast.success("Location deleted successfully");
+      fetchLocations();
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingLocation(null);
+    resetLocationForm();
   };
 
   if (loading) {
@@ -279,6 +416,7 @@ const Admin = () => {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="companies">Companies</TabsTrigger>
+            <TabsTrigger value="locations">Locations</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
             <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
           </TabsList>
@@ -422,6 +560,195 @@ const Admin = () => {
                           <TableCell>{company.email}</TableCell>
                           <TableCell>{company.phone}</TableCell>
                           <TableCell>{company.address}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="locations" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingLocation ? "Edit" : "Add New"} Recycling Location</CardTitle>
+                <CardDescription>
+                  Manage recycling drop-off locations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleLocationSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="loc_name">Location Name *</Label>
+                      <Input
+                        id="loc_name"
+                        placeholder="e.g., KWASU Main Campus"
+                        value={locationForm.name}
+                        onChange={(e) => setLocationForm({ ...locationForm, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="loc_company">Recycling Company</Label>
+                      <select
+                        id="loc_company"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={locationForm.company_id}
+                        onChange={(e) => setLocationForm({ ...locationForm, company_id: e.target.value })}
+                      >
+                        <option value="">Select Company (optional)</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.id}>
+                            {company.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label htmlFor="loc_address">Address *</Label>
+                      <Textarea
+                        id="loc_address"
+                        placeholder="Full address"
+                        value={locationForm.address}
+                        onChange={(e) => setLocationForm({ ...locationForm, address: e.target.value })}
+                        required
+                        rows={2}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="capacity">Capacity (kg) *</Label>
+                      <Input
+                        id="capacity"
+                        type="number"
+                        step="0.01"
+                        placeholder="1000"
+                        value={locationForm.capacity_kg}
+                        onChange={(e) => setLocationForm({ ...locationForm, capacity_kg: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="current_weight">Current Weight (kg)</Label>
+                      <Input
+                        id="current_weight"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        value={locationForm.current_weight_kg}
+                        onChange={(e) => setLocationForm({ ...locationForm, current_weight_kg: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="status">Status</Label>
+                      <select
+                        id="status"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={locationForm.status}
+                        onChange={(e) => setLocationForm({ ...locationForm, status: e.target.value })}
+                      >
+                        <option value="available">Available</option>
+                        <option value="full">Full</option>
+                        <option value="maintenance">Maintenance</option>
+                      </select>
+                    </div>
+                    <div></div>
+                    <div>
+                      <Label htmlFor="latitude">Latitude (optional)</Label>
+                      <Input
+                        id="latitude"
+                        type="number"
+                        step="any"
+                        placeholder="8.4799"
+                        value={locationForm.latitude}
+                        onChange={(e) => setLocationForm({ ...locationForm, latitude: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="longitude">Longitude (optional)</Label>
+                      <Input
+                        id="longitude"
+                        type="number"
+                        step="any"
+                        placeholder="4.5418"
+                        value={locationForm.longitude}
+                        onChange={(e) => setLocationForm({ ...locationForm, longitude: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="submit">
+                      {editingLocation ? <Edit className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+                      {editingLocation ? "Update Location" : "Add Location"}
+                    </Button>
+                    {editingLocation && (
+                      <Button type="button" variant="outline" onClick={cancelEdit}>
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>All Locations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Address</TableHead>
+                        <TableHead>Company</TableHead>
+                        <TableHead>Capacity (kg)</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {locations.map((location) => (
+                        <TableRow key={location.id}>
+                          <TableCell className="font-medium">{location.name}</TableCell>
+                          <TableCell className="max-w-xs truncate">{location.address}</TableCell>
+                          <TableCell>{location.companies?.name || "N/A"}</TableCell>
+                          <TableCell>
+                            {Number(location.current_weight_kg).toFixed(2)} / {Number(location.capacity_kg).toFixed(2)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                location.status === "available"
+                                  ? "default"
+                                  : location.status === "full"
+                                  ? "destructive"
+                                  : "secondary"
+                              }
+                            >
+                              {location.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditLocation(location)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleDeleteLocation(location.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
