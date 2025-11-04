@@ -36,14 +36,30 @@ const Leaderboard = () => {
 
   const fetchLeaderboard = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch profiles excluding admins
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("id, username, full_name, points")
-        .order("points", { ascending: false })
-        .limit(100);
+        .order("points", { ascending: false });
 
-      if (error) throw error;
-      setEntries(data || []);
+      if (profilesError) throw profilesError;
+
+      // Get admin user IDs
+      const { data: adminRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+
+      if (rolesError) throw rolesError;
+
+      const adminIds = new Set(adminRoles?.map(r => r.user_id) || []);
+      
+      // Filter out admins and take top 100
+      const filteredData = (profilesData || [])
+        .filter(profile => !adminIds.has(profile.id))
+        .slice(0, 100);
+
+      setEntries(filteredData);
     } catch (error: any) {
       toast.error("Failed to load leaderboard");
       console.error(error);

@@ -298,35 +298,53 @@ const Admin = () => {
           <TabsContent value="companies" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Register New Company</CardTitle>
-                <CardDescription>Add a new recycling company location</CardDescription>
+                <CardTitle>Register New Recycling Company</CardTitle>
+                <CardDescription>
+                  Register recycling companies to partner with our waste management system
+                </CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="font-semibold mb-2">Required Information:</h3>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Company name (official registered name)</li>
+                    <li>• Valid email address for official correspondence</li>
+                    <li>• Phone number (company contact line)</li>
+                    <li>• Contact person (authorized representative)</li>
+                    <li>• Physical address (headquarters or main office)</li>
+                    <li>• Registration number (RC number or business registration - optional)</li>
+                    <li>• Company description (services offered - optional)</li>
+                  </ul>
+                </div>
+
                 <form onSubmit={handleCompanySubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="name">Company Name *</Label>
                       <Input
                         id="name"
+                        placeholder="e.g., Vicfold Recyclers"
                         value={companyForm.name}
                         onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })}
                         required
                       />
                     </div>
                     <div>
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="email">Official Email *</Label>
                       <Input
                         id="email"
                         type="email"
+                        placeholder="company@example.com"
                         value={companyForm.email}
                         onChange={(e) => setCompanyForm({ ...companyForm, email: e.target.value })}
                         required
                       />
                     </div>
                     <div>
-                      <Label htmlFor="phone">Phone *</Label>
+                      <Label htmlFor="phone">Phone Number *</Label>
                       <Input
                         id="phone"
+                        placeholder="+234 xxx xxxx xxx"
                         value={companyForm.phone}
                         onChange={(e) => setCompanyForm({ ...companyForm, phone: e.target.value })}
                         required
@@ -336,23 +354,26 @@ const Admin = () => {
                       <Label htmlFor="contact_person">Contact Person *</Label>
                       <Input
                         id="contact_person"
+                        placeholder="Authorized representative"
                         value={companyForm.contact_person}
                         onChange={(e) => setCompanyForm({ ...companyForm, contact_person: e.target.value })}
                         required
                       />
                     </div>
                     <div>
-                      <Label htmlFor="registration_number">Registration Number</Label>
+                      <Label htmlFor="registration_number">Registration Number (RC Number)</Label>
                       <Input
                         id="registration_number"
+                        placeholder="RC123456 (optional)"
                         value={companyForm.registration_number}
                         onChange={(e) => setCompanyForm({ ...companyForm, registration_number: e.target.value })}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="address">Address *</Label>
+                      <Label htmlFor="address">Physical Address *</Label>
                       <Input
                         id="address"
+                        placeholder="Street, City, State"
                         value={companyForm.address}
                         onChange={(e) => setCompanyForm({ ...companyForm, address: e.target.value })}
                         required
@@ -360,9 +381,10 @@ const Admin = () => {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">Description / Services Offered</Label>
                     <Textarea
                       id="description"
+                      placeholder="Brief description of recycling services (optional)"
                       value={companyForm.description}
                       onChange={(e) => setCompanyForm({ ...companyForm, description: e.target.value })}
                       rows={3}
