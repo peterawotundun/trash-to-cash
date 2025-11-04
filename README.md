@@ -35,7 +35,7 @@ Trash to Cash is a full-stack recycling incentive platform that rewards users fo
 - 🏆 **Leaderboards**: Compete with other users (admins excluded from rankings)
 - 🔐 **Secure Authentication**: Phone number or email-based authentication
 - 📊 **Analytics Dashboard**: Track personal recycling impact and earnings
-- 🛠️ **Admin Tools**: Manage locations, users, and monitor system health
+- 🛠️ **Admin Tools**: Manage locations, users, and monitor system health.
 
 ---
 
