@@ -49,10 +49,14 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Generate UUID for the new user
+    const userId = crypto.randomUUID();
+
     // Create new hardware-only user profile
     const { data: newProfile, error: insertError } = await supabase
       .from('profiles')
       .insert({
+        id: userId,
         full_name: 'Hardware User',
         username: `user_${unique_code.substring(0, 8)}`,
         unique_code: unique_code,
