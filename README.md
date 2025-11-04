@@ -65,6 +65,10 @@ Trash to Cash is a full-stack recycling incentive platform that rewards users fo
 - **ESP32/Arduino** - Supported microcontrollers
 - **Load Cell Sensors** - Weight measurement
 - **WiFi Modules** - Network connectivity
+- **User Flow**: Both registered and unregistered users can use the hardware
+  - New users get temporary profiles automatically
+  - Points are tracked immediately
+  - Users can register online later to claim accumulated points
 
 ---
 
@@ -134,6 +138,8 @@ src/
 
 supabase/
 ├── functions/        # Edge Functions
+│   ├── check-user/   # Verify user existence
+│   ├── register-user/ # Create temporary hardware user
 │   ├── submit-waste/ # Waste submission endpoint
 │   └── send-confirmation-email/ # Email notifications
 └── migrations/       # Database migrations
@@ -143,7 +149,8 @@ supabase/
 
 **profiles**
 - User account information and unique deposit codes
-- Fields: `id`, `full_name`, `username`, `unique_code`, `balance`, `total_earned`, `email`, `phone_number`
+- Fields: `id`, `full_name`, `username`, `unique_code`, `points`, `is_registered`, `created_at`, `updated_at`
+- `is_registered`: `true` for fully registered users, `false` for hardware-only users
 
 **locations**
 - Recycling bin locations with capacity tracking
@@ -270,9 +277,23 @@ ESP32_Servo (Specific for ESP32)
 HX711
 ArduinoJson
 2. **Networking and Backend (Supabase)**
-This project requires a live Supabase project configured with two Edge Functions:
-check-user: Accepts a unique_code and returns {"exists": true/false}.
-submit-waste: Accepts unique_code, weight_kg, and logs the data to a Supabase table.
+This project requires a live Supabase project configured with the following Edge Functions:
+
+**check-user**: Verifies if a user exists in the database
+- Endpoint: `/functions/v1/check-user`
+- Input: `{ "unique_code": "string" }`
+- Output: `{ "exists": boolean, "user_id": "uuid", "is_registered": boolean }`
+
+**register-user**: Creates a temporary hardware-only user profile
+- Endpoint: `/functions/v1/register-user`
+- Input: `{ "unique_code": "string" }`
+- Output: `{ "success": boolean, "user_id": "uuid", "is_registered": false }`
+- Note: Creates users with `is_registered: false` who can later claim their points by registering online
+
+**submit-waste**: Logs waste deposits and credits points
+- Endpoint: `/functions/v1/submit-waste`
+- Input: `{ "unique_code": "string", "weight_kg": number, "location_id": "uuid (optional)" }`
+- Output: Transaction details and updated point balance
 3. **ESP32-CAM Classifier**
 The second sketch (esp32cam_classifier.ino) is for the ESP32-CAM and is based on an Edge Impulse classification model.
 Edge Impulse Project: Create an object detection or image classification project on Edge Impulse and deploy the C++ Library for the ESP32 platform.
@@ -281,7 +302,13 @@ Edge Impulse Project: Create an object detection or image classification project
 ##**Operation Flow**
 **Deep Sleep**: System is asleep, conserving power.
 **Wake Up**: User presses any key on the keypad.
-**Authentication (STATE_IDLE**): User enters a phone ID (unique code) and presses #. The ESP32 checks the ID against the Supabase backend.
+**Authentication (STATE_IDLE)**: 
+   - User enters a phone number or unique code and presses #
+   - ESP32 calls the `check-user` edge function to verify if user exists
+   - **If user exists**: Proceeds to sorting (registered or hardware-only user)
+   - **If user doesn't exist**: ESP32 calls `register-user` edge function to create a temporary profile
+   - New hardware-only users can immediately start sorting and earn points
+   - They can later register online using the signup form to claim their accumulated points
 **Sorting (STATE_SORTING):**
 Lid opens. LCD prompts the user to place waste.
 The ESP32 Master repeatedly sends the CAP command to the ESP32-CAM via Serial2.
@@ -400,6 +427,8 @@ vercel --prod
 1. **Database Migrations**: Automatically applied via Supabase CLI
 2. **Edge Functions**: 
    ```bash
+   supabase functions deploy check-user
+   supabase functions deploy register-user
    supabase functions deploy submit-waste
    supabase functions deploy send-confirmation-email
    ```

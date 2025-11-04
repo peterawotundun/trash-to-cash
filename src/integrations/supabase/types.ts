@@ -105,6 +105,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_registered: boolean | null
           points: number
           unique_code: string
           updated_at: string
@@ -114,6 +115,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id: string
+          is_registered?: boolean | null
           points?: number
           unique_code: string
           updated_at?: string
@@ -123,6 +125,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          is_registered?: boolean | null
           points?: number
           unique_code?: string
           updated_at?: string

@@ -23,6 +23,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [existingCode, setExistingCode] = useState(""); // For claiming existing hardware user account
 
   useEffect(() => {
     // Check if user is already logged in
@@ -66,7 +67,31 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // If user provided an existing code, check if it exists and claim it
+      let uniqueCodeToUse = phoneNumber;
+      
+      if (existingCode) {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('unique_code, is_registered, id')
+          .eq('unique_code', existingCode)
+          .single();
+
+        if (existingProfile) {
+          if (existingProfile.is_registered) {
+            toast.error("This code is already registered to an account.");
+            setLoading(false);
+            return;
+          }
+          uniqueCodeToUse = existingCode;
+        } else {
+          toast.error("Invalid code. Please check and try again.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      const { data, error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
@@ -74,13 +99,42 @@ const Auth = () => {
           data: {
             full_name: fullName,
             username: username,
-            phone_number: phoneNumber,
+            phone_number: uniqueCodeToUse,
           },
         },
       });
 
       if (error) throw error;
-      toast.success("Account created! Please check your email to verify.");
+
+      // If claiming an existing code, update the profile
+      if (existingCode && data.user) {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('unique_code', existingCode)
+          .single();
+
+        if (existingProfile) {
+          // Delete the old unregistered profile
+          await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', existingProfile.id);
+
+          // Update the new profile created by the trigger
+          await supabase
+            .from('profiles')
+            .update({
+              unique_code: existingCode,
+              is_registered: true
+            })
+            .eq('id', data.user.id);
+        }
+      }
+
+      toast.success(existingCode 
+        ? "Account linked! Your points have been claimed." 
+        : "Account created! Please check your email to verify.");
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
     } finally {
@@ -161,14 +215,25 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone-number">Phone Number (Your Unique ID)</Label>
+                  <Label htmlFor="phone-number">Phone Number (if new user)</Label>
                   <Input
                     id="phone-number"
                     type="tel"
                     placeholder="08012345678"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
+                    required={!existingCode}
+                  />
+                </div>
+                <div className="text-center text-sm text-muted-foreground">- OR -</div>
+                <div className="space-y-2">
+                  <Label htmlFor="existing-code">Existing Hardware Code (if you used the bin before)</Label>
+                  <Input
+                    id="existing-code"
+                    type="text"
+                    placeholder="Enter your code from hardware"
+                    value={existingCode}
+                    onChange={(e) => setExistingCode(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
