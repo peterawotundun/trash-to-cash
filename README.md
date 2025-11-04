@@ -226,233 +226,72 @@ npm run preview
 ---
 
 ## Hardware Developer Guide
+This project implements a fully automated, internet-connected smart waste sorting machine built around the ESP32 and ESP32-CAM. It uses Machine Learning (via Edge Impulse) to classify waste and a load cell to accurately measure the deposited weight. A custom backend (using Supabase) handles user authentication, data logging, and rewards tracking.
 
-### Supported Hardware
-
-- **Microcontrollers**: ESP32, ESP8266, Arduino with WiFi shield
-- **Sensors**: HX711 load cell amplifier + load cell (up to 50kg recommended)
-- **Power**: 5V USB or battery pack with voltage regulator
-- **Connectivity**: WiFi (2.4GHz)
-
-### Hardware Setup
-
-**Wiring Diagram (ESP32 + HX711)**
-
-```
-HX711 Load Cell Amplifier → ESP32
---------------------------------
-VCC  → 3.3V
-GND  → GND
-DT   → GPIO 4 (Data)
-SCK  → GPIO 5 (Clock)
-
-Load Cell → HX711
------------------
-RED   → E+
-BLACK → E-
-WHITE → A-
-GREEN → A+
-```
-
-### Calibration Process
-
-1. **Zero Calibration**: Run with no weight to get baseline reading
-2. **Weight Calibration**: Place known weight (e.g., 1kg) and calculate scale factor
-3. **Save Calibration**: Store factor in EEPROM or code constant
-
-```cpp
-// Example calibration code
-#include "HX711.h"
-
-const int LOADCELL_DOUT_PIN = 4;
-const int LOADCELL_SCK_PIN = 5;
-HX711 scale;
-
-void calibrate() {
-  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  
-  // Tare (zero) the scale
-  scale.tare();
-  
-  // Place known weight (1000g)
-  Serial.println("Place 1kg weight now...");
-  delay(5000);
-  
-  // Calculate scale factor
-  float reading = scale.get_units(10);
-  float calibration_factor = reading / 1000.0;
-  
-  scale.set_scale(calibration_factor);
-}
-```
-
-### Sample Arduino/ESP32 Code
-
-```cpp
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include "HX711.h"
-
-// WiFi credentials
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
-
-// API endpoint
-const char* apiUrl = "https://your-project.supabase.co/functions/v1/submit-waste";
-
-// Load cell pins
-const int LOADCELL_DOUT_PIN = 4;
-const int LOADCELL_SCK_PIN = 5;
-HX711 scale;
-
-// Calibration factor (adjust after calibration)
-float calibration_factor = 2280.0;
-
-void setup() {
-  Serial.begin(115200);
-  
-  // Initialize scale
-  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  scale.set_scale(calibration_factor);
-  scale.tare();
-  
-  // Connect to WiFi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi connected");
-}
-
-void loop() {
-  // Read weight
-  float weight = scale.get_units(5) / 1000.0; // Convert to kg
-  
-  if (weight > 0.1) { // Minimum 100g threshold
-    Serial.printf("Weight detected: %.2f kg\n", weight);
-    
-    // Submit to API
-    submitWaste("ABC12345", "plastic", weight, "location-uuid");
-    
-    // Wait for removal
-    delay(5000);
-    scale.tare(); // Reset scale
-  }
-  
-  delay(100);
-}
-
-void submitWaste(String uniqueCode, String wasteType, float weight, String locationId) {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(apiUrl);
-    http.addHeader("Content-Type", "application/json");
-    
-    // Build JSON payload
-    String payload = "{";
-    payload += "\"unique_code\":\"" + uniqueCode + "\",";
-    payload += "\"waste_type\":\"" + wasteType + "\",";
-    payload += "\"weight_kg\":" + String(weight, 3) + ",";
-    payload += "\"location_id\":\"" + locationId + "\"";
-    payload += "}";
-    
-    // Send POST request
-    int httpResponseCode = http.POST(payload);
-    
-    if (httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.println("Response: " + response);
-    } else {
-      Serial.println("Error: " + String(httpResponseCode));
-    }
-    
-    http.end();
-  }
-}
-```
-
-### Power Optimization
-
-```cpp
-// Use deep sleep between readings (ESP32)
-#include "esp_sleep.h"
-
-void goToSleep(int seconds) {
-  esp_sleep_enable_timer_wakeup(seconds * 1000000);
-  esp_deep_sleep_start();
-}
-
-// In loop, after submission:
-goToSleep(60); // Sleep for 60 seconds
-```
-
----
-
-## Hardware-Software Integration
-
-### API Endpoint: Submit Waste
-
-**Endpoint**: `POST /functions/v1/submit-waste`
-
-**Request Headers**
-```
-Content-Type: application/json
-```
-
-**Request Body**
-```json
-{
-  "unique_code": "ABC12345",
-  "waste_type": "plastic",
-  "weight_kg": 1.5,
-  "location_id": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
-
-**Parameters**
-- `unique_code` (required): 8-character user identifier from their profile
-- `waste_type` (required): Type of waste - "plastic", "paper", "metal", "glass", or "other"
-- `weight_kg` (required): Weight in kilograms (minimum 0.0001 kg)
-- `location_id` (optional): UUID of the location where waste was deposited
-
-**Success Response** (200 OK)
-```json
-{
-  "success": true,
-  "message": "Waste deposited successfully",
-  "data": {
-    "transaction_id": "uuid",
-    "points_earned": 15000,
-    "new_balance": 25000,
-    "weight_kg": 1.5
-  }
-}
-```
-
-**Error Responses**
-
-400 Bad Request
-```json
-{
-  "error": "Invalid request",
-  "details": "weight_kg must be at least 0.0001"
-}
-```
-
-404 Not Found
-```json
-{
-  "error": "User not found with code: ABC12345"
-}
-```
-
-500 Internal Server Error
-```json
-{
-  "error": "Failed to process waste deposit"
-}
-```
+ Key Features
+**Machine Learning Sorting:** Utilizes an ESP32-CAM module running an Edge Impulse model to classify waste (e.g., Plastic Bottle, Nylon).
+**User Authentication:** Users authenticate via a Keypad (phone ID) before starting the sorting process.
+**IoT Connectivity:** Connects to a Supabase backend via Wi-Fi to verify user accounts and log waste transaction data.
+**Accurate Weighing:** An HX711 Load Cell measures the weight of the deposited waste for reward calculation.
+**Automated Control:** Servo Motors manage the lid opening/closing and the waste sorting gate.
+**Power Efficiency:** Implements Deep Sleep mode, waking only when a key is pressed to conserve power.
+**Robust Session Management:** Features Auto-Stop based on weight stabilization and Manual Finish
+**Main ESP32 controller**
+**Component**,**Function**,**Pins Used**,**Libraries**
+ESP32 Dev Board,"Main logic, WiFi, HTTP",-,-
+HX711 Load Cell,Weight Measurement,"DOUT (19), CLK (18)",HX711
+16x2 I2C LCD,User Interface/Feedback,"SDA (21), SCL (22)",LiquidCrystal_I2C
+4x3 Keypad,"User Input (ID, Control)","Rows (13, 12, 14, 27), Cols (26, 25, 33)",Keypad
+Lid Servo,Opens/Closes the waste inlet,GPIO 5,ESP32_Servo
+Sorter Servo,Directs waste to the correct bin,GPIO 4,ESP32_Servo
+Serial Connection (to CAM),Communicates with the Classifier,"TX (17), RX (16)",HardwareSerial (2)
+## Classifier AI 
+**Component**,    **Function**,      **Notes**
+ESP32-CAM,Image Capture & ML Inference,Runs the Edge Impulse model.
+Serial Connection (to Master),Sends classification results (via UART0),Wired to the Master's Serial2.
+##Wiring Diagram 
+**Master ESP32 Pin**    ,**Component Connection**,        **Notes**
+5V / VIN,"Power Supply  , Servos, HX711, LCD",      Ensure adequate power supply for servos.
+GND,  All Component Grounds  ,Common Ground.
+GPIO 4,  Sorter Servo Signal,  Moves waste left/right.
+GPIO 5,  Lid Servo Signal,  Opens/Closes inlet.
+GPIO 18 / 19,HX711 CLK / DOUT,Load cell module.
+GPIO 21 / 22,LCD SDA / SCL,I2C Communication.
+GPIO 17 (TX2)  ,ESP32-CAM RX (U0RXD)  ,"Master sends ""CAP""."
+GPIO 16 (RX2),  ESP32-CAM TX (U0TXD),  Master receives JSON prediction.
+"GPIO 12, 13, 14, 27",Keypad Row Pins,Must be RTC-capable for Deep Sleep wakeup.
+"GPIO 25, 26, 33",Keypad Column Pins,-
+**Software and Setup**
+1. **Arduino IDE Setup**
+Install the following libraries via the Arduino Library Manager:
+LiquidCrystal_I2C
+Keypad
+ESP32_Servo (Specific for ESP32)
+HX711
+ArduinoJson
+2. **Networking and Backend (Supabase)**
+This project requires a live Supabase project configured with two Edge Functions:
+check-user: Accepts a unique_code and returns {"exists": true/false}.
+submit-waste: Accepts unique_code, weight_kg, and logs the data to a Supabase table.
+3. **ESP32-CAM Classifier**
+The second sketch (esp32cam_classifier.ino) is for the ESP32-CAM and is based on an Edge Impulse classification model.
+Edge Impulse Project: Create an object detection or image classification project on Edge Impulse and deploy the C++ Library for the ESP32 platform.
+**Model Integration**: Place the generated library files into your Arduino libraries folder and ensure the main code includes the necessary headers (<waste_inferencing.h>).
+**Firmware:** Flash the esp32cam_classifier.ino sketch to the ESP32-CAM.
+##**Operation Flow**
+**Deep Sleep**: System is asleep, conserving power.
+**Wake Up**: User presses any key on the keypad.
+**Authentication (STATE_IDLE**): User enters a phone ID (unique code) and presses #. The ESP32 checks the ID against the Supabase backend.
+**Sorting (STATE_SORTING):**
+Lid opens. LCD prompts the user to place waste.
+The ESP32 Master repeatedly sends the CAP command to the ESP32-CAM via Serial2.
+The ESP32-CAM captures an image, runs inference, and sends back a JSON prediction ({"prediction":"Bottle"}).
+The Sorter Servo moves to the predicted bin angle (0 for Bottle, 180 for Nylon).
+The session is finalized either by Manual Finish (# key) or Auto-Stop (no significant weight change for 4 seconds).
+**Uploading (STATE_UPLOADING):**
+Lid closes. Final weight is measured.
+The waste type, net weight, and user ID are sent to the Supabase backend for reward processing.
+Return to Sleep (STATE_SLEEP): The system goes back to Deep Sleep mode.
 
 ### Points Calculation
 
