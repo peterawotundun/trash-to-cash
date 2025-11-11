@@ -4,13 +4,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/legacy/UserAuth";
+import Dashboard from "./pages/legacy/UserDashboard";
 import Locations from "./pages/Locations";
-import Leaderboard from "./pages/Leaderboard";
-import History from "./pages/History";
+import Leaderboard from "./pages/legacy/UserLeaderboard";
+import History from "./pages/legacy/UserHistory";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import CompanyRegister from "./pages/CompanyRegister";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/company-register" element={<CompanyRegister />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/locations" element={<Locations />} />
