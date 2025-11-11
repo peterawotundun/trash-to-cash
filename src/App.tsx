@@ -11,6 +11,8 @@ import Leaderboard from "./pages/legacy/UserLeaderboard";
 import History from "./pages/legacy/UserHistory";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import CompanyAuth from "./pages/CompanyAuth";
+import CompanyLogin from "./pages/CompanyLogin";
 import CompanyRegister from "./pages/CompanyRegister";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/company-auth" element={<CompanyAuth />} />
+          <Route path="/company-login" element={<CompanyLogin />} />
           <Route path="/company-register" element={<CompanyRegister />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />

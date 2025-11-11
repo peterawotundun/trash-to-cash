@@ -49,7 +49,7 @@ const Index = () => {
               <Button 
                 size="sm"
                 className="bg-green-600 hover:bg-green-700"
-                onClick={() => navigate("/company-register")}
+                onClick={() => navigate("/company-auth")}
               >
                 Get Started
               </Button>
@@ -86,7 +86,7 @@ const Index = () => {
             <Button 
               size="lg" 
               className="gap-2 bg-green-600 hover:bg-green-700 text-base"
-              onClick={() => navigate("/company-register")}
+              onClick={() => navigate("/company-auth")}
             >
               Partner With Us
             </Button>
@@ -199,7 +199,7 @@ const Index = () => {
             <Button 
               size="lg" 
               className="gap-2 bg-white text-green-700 hover:bg-green-50 text-base font-semibold px-8"
-              onClick={() => navigate("/company-register")}
+              onClick={() => navigate("/company-auth")}
             >
               Start Your Partnership Journey
             </Button>
