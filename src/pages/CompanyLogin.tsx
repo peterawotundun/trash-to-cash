@@ -32,7 +32,7 @@ const CompanyLogin = () => {
         description: "Redirecting to your dashboard...",
       });
 
-      navigate("/dashboard");
+      navigate("/company-dashboard");
     } catch (error: any) {
       toast({
         title: "Login Failed",

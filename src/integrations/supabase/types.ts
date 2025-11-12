@@ -17,6 +17,7 @@ export type Database = {
       companies: {
         Row: {
           address: string
+          cash_reward_enabled: boolean | null
           contact_person: string
           created_at: string
           description: string | null
@@ -24,11 +25,13 @@ export type Database = {
           id: string
           name: string
           phone: string
+          points_per_kg: number | null
           registration_number: string | null
           updated_at: string
         }
         Insert: {
           address: string
+          cash_reward_enabled?: boolean | null
           contact_person: string
           created_at?: string
           description?: string | null
@@ -36,11 +39,13 @@ export type Database = {
           id?: string
           name: string
           phone: string
+          points_per_kg?: number | null
           registration_number?: string | null
           updated_at?: string
         }
         Update: {
           address?: string
+          cash_reward_enabled?: boolean | null
           contact_person?: string
           created_at?: string
           description?: string | null
@@ -48,6 +53,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string
+          points_per_kg?: number | null
           registration_number?: string | null
           updated_at?: string
         }
