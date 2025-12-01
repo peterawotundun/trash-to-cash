@@ -16,7 +16,8 @@ import {
   TrendingUp, 
   DollarSign,
   LogOut,
-  Trash2
+  Trash2,
+  Upload
 } from "lucide-react";
 
 interface Company {
@@ -56,6 +57,7 @@ const CompanyDashboard = () => {
   const [company, setCompany] = useState<Company | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -192,6 +194,50 @@ const CompanyDashboard = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+    if (!company) return;
+
+    const file = event.target.files[0];
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${company.id}/${Date.now()}.${fileExt}`;
+
+    setUploadingLogo(true);
+    try {
+      // Get the current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Upload the file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from("company-logos")
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("company-logos")
+        .getPublicUrl(fileName);
+
+      // Update the company state with the new logo URL
+      setCompany({ ...company, logo_url: publicUrl });
+
+      toast({
+        title: "Success",
+        description: "Logo uploaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -488,18 +534,45 @@ const CompanyDashboard = () => {
                   <>
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="logo-url">Logo URL</Label>
-                        <Input
-                          id="logo-url"
-                          value={company.logo_url || ""}
-                          onChange={(e) =>
-                            setCompany({ ...company, logo_url: e.target.value })
-                          }
-                          placeholder="https://example.com/logo.png"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Upload your logo to an image hosting service and paste the URL here
-                        </p>
+                        <Label htmlFor="logo-upload">Company Logo</Label>
+                        <div className="flex flex-col gap-3">
+                          {company.logo_url && (
+                            <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/50">
+                              <img
+                                src={company.logo_url}
+                                alt="Company logo"
+                                className="h-16 w-16 object-contain rounded"
+                              />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">Current logo</p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {company.logo_url}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          <div className="flex gap-2">
+                            <Input
+                              id="logo-upload"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleLogoUpload}
+                              disabled={uploadingLogo}
+                              className="flex-1"
+                            />
+                            <Button
+                              variant="outline"
+                              disabled={uploadingLogo}
+                              onClick={() => document.getElementById("logo-upload")?.click()}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              {uploadingLogo ? "Uploading..." : "Upload"}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Upload your company logo (PNG, JPG, or SVG recommended)
+                          </p>
+                        </div>
                       </div>
 
                       <div className="grid gap-4 md:grid-cols-2">
