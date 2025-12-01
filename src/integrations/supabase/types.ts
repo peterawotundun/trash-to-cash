@@ -18,44 +18,62 @@ export type Database = {
         Row: {
           address: string
           cash_reward_enabled: boolean | null
+          company_slug: string | null
           contact_person: string
           created_at: string
           description: string | null
           email: string
           id: string
+          logo_url: string | null
+          min_withdrawal_amount: number | null
           name: string
           phone: string
           points_per_kg: number | null
+          primary_color: string | null
           registration_number: string | null
+          secondary_color: string | null
           updated_at: string
+          welcome_message: string | null
         }
         Insert: {
           address: string
           cash_reward_enabled?: boolean | null
+          company_slug?: string | null
           contact_person: string
           created_at?: string
           description?: string | null
           email: string
           id?: string
+          logo_url?: string | null
+          min_withdrawal_amount?: number | null
           name: string
           phone: string
           points_per_kg?: number | null
+          primary_color?: string | null
           registration_number?: string | null
+          secondary_color?: string | null
           updated_at?: string
+          welcome_message?: string | null
         }
         Update: {
           address?: string
           cash_reward_enabled?: boolean | null
+          company_slug?: string | null
           contact_person?: string
           created_at?: string
           description?: string | null
           email?: string
           id?: string
+          logo_url?: string | null
+          min_withdrawal_amount?: number | null
           name?: string
           phone?: string
           points_per_kg?: number | null
+          primary_color?: string | null
           registration_number?: string | null
+          secondary_color?: string | null
           updated_at?: string
+          welcome_message?: string | null
         }
         Relationships: []
       }
@@ -248,6 +266,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_company_slug: { Args: { company_name: string }; Returns: string }
       generate_unique_code: { Args: never; Returns: string }
       has_role: {
         Args: {

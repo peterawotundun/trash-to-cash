@@ -30,6 +30,12 @@ interface Company {
   registration_number: string | null;
   cash_reward_enabled: boolean;
   points_per_kg: number;
+  company_slug: string | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  welcome_message: string | null;
+  min_withdrawal_amount: number | null;
 }
 
 interface Location {
@@ -189,6 +195,45 @@ const CompanyDashboard = () => {
     }
   };
 
+  const handleUpdateBranding = async () => {
+    if (!company) return;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("companies")
+        .update({
+          logo_url: company.logo_url,
+          primary_color: company.primary_color,
+          secondary_color: company.secondary_color,
+          welcome_message: company.welcome_message,
+          min_withdrawal_amount: company.min_withdrawal_amount,
+        })
+        .eq("id", company.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Branding updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openUserPortal = () => {
+    if (company?.company_slug) {
+      window.open(`/portal/${company.company_slug}`, "_blank");
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
@@ -248,7 +293,7 @@ const CompanyDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-4">
+          <TabsList className="grid w-full max-w-2xl grid-cols-5">
             <TabsTrigger value="overview">
               <LayoutDashboard className="h-4 w-4 mr-2" />
               Overview
@@ -256,6 +301,10 @@ const CompanyDashboard = () => {
             <TabsTrigger value="rewards">
               <DollarSign className="h-4 w-4 mr-2" />
               Rewards
+            </TabsTrigger>
+            <TabsTrigger value="branding">
+              <Settings className="h-4 w-4 mr-2" />
+              Branding
             </TabsTrigger>
             <TabsTrigger value="locations">
               <MapPin className="h-4 w-4 mr-2" />
@@ -389,7 +438,146 @@ const CompanyDashboard = () => {
                         Users will earn {company.points_per_kg} points for every kg of waste deposited
                       </p>
                     </div>
+
+                    <div className="pt-4 border-t">
+                      <p className="text-sm font-medium mb-2">Your User Portal</p>
+                      <Button 
+                        onClick={openUserPortal}
+                        variant="outline"
+                        className="w-full"
+                        disabled={!company.company_slug}
+                      >
+                        View Your Branded Portal
+                      </Button>
+                      {company.company_slug && (
+                        <p className="text-xs text-muted-foreground mt-2 text-center">
+                          URL: {window.location.origin}/portal/{company.company_slug}
+                        </p>
+                      )}
+                    </div>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Branding Tab */}
+          <TabsContent value="branding" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Customize Your User Portal</CardTitle>
+                <CardDescription>
+                  Personalize the look and feel of your user-facing rewards portal
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {!company.cash_reward_enabled ? (
+                  <div className="p-8 text-center border-2 border-dashed rounded-lg">
+                    <p className="text-muted-foreground mb-4">
+                      Enable cash rewards to customize your user portal
+                    </p>
+                    <Button onClick={() => handleToggleCashReward(true)}>
+                      Enable Cash Rewards
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="logo-url">Logo URL</Label>
+                        <Input
+                          id="logo-url"
+                          value={company.logo_url || ""}
+                          onChange={(e) =>
+                            setCompany({ ...company, logo_url: e.target.value })
+                          }
+                          placeholder="https://example.com/logo.png"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Upload your logo to an image hosting service and paste the URL here
+                        </p>
+                      </div>
+
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <Label htmlFor="primary-color">Primary Color</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="primary-color"
+                              type="color"
+                              value={company.primary_color || "#10b981"}
+                              onChange={(e) =>
+                                setCompany({ ...company, primary_color: e.target.value })
+                              }
+                              className="w-20 h-10"
+                            />
+                            <Input
+                              value={company.primary_color || "#10b981"}
+                              onChange={(e) =>
+                                setCompany({ ...company, primary_color: e.target.value })
+                              }
+                              placeholder="#10b981"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="secondary-color">Secondary Color</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="secondary-color"
+                              type="color"
+                              value={company.secondary_color || "#059669"}
+                              onChange={(e) =>
+                                setCompany({ ...company, secondary_color: e.target.value })
+                              }
+                              className="w-20 h-10"
+                            />
+                            <Input
+                              value={company.secondary_color || "#059669"}
+                              onChange={(e) =>
+                                setCompany({ ...company, secondary_color: e.target.value })
+                              }
+                              placeholder="#059669"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="welcome-message">Welcome Message</Label>
+                        <Textarea
+                          id="welcome-message"
+                          value={company.welcome_message || ""}
+                          onChange={(e) =>
+                            setCompany({ ...company, welcome_message: e.target.value })
+                          }
+                          placeholder="Welcome to our recycling rewards program!"
+                          rows={3}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="min-withdrawal">Minimum Withdrawal Amount (₦)</Label>
+                        <Input
+                          id="min-withdrawal"
+                          type="number"
+                          value={company.min_withdrawal_amount || 1000}
+                          onChange={(e) =>
+                            setCompany({
+                              ...company,
+                              min_withdrawal_amount: Number(e.target.value),
+                            })
+                          }
+                          min="100"
+                        />
+                      </div>
+                    </div>
+
+                    <Button onClick={handleUpdateBranding} disabled={saving} className="w-full">
+                      {saving ? "Saving..." : "Save Branding"}
+                    </Button>
+                  </>
                 )}
               </CardContent>
             </Card>

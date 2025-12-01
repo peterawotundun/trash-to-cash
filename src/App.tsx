@@ -15,6 +15,7 @@ import CompanyAuth from "./pages/CompanyAuth";
 import CompanyLogin from "./pages/CompanyLogin";
 import CompanyRegister from "./pages/CompanyRegister";
 import CompanyDashboard from "./pages/CompanyDashboard";
+import CompanyPortal from "./pages/CompanyPortal";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/company-login" element={<CompanyLogin />} />
           <Route path="/company-register" element={<CompanyRegister />} />
           <Route path="/company-dashboard" element={<CompanyDashboard />} />
+          <Route path="/portal/:slug" element={<CompanyPortal />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/locations" element={<Locations />} />
