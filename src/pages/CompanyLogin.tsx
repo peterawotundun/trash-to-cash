@@ -58,10 +58,10 @@ const CompanyLogin = () => {
 
         <Card className="max-w-md mx-auto shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl text-green-800 dark:text-green-400">
+            <CardTitle className="text-2xl sm:text-3xl text-green-800 dark:text-green-400">
               Company Sign In
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               Access your Trashformer dashboard
             </CardDescription>
           </CardHeader>

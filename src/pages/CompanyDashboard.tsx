@@ -276,42 +276,46 @@ const CompanyDashboard = () => {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Trash2 className="h-8 w-8 text-green-600" />
+            <Trash2 className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
             <div>
-              <h1 className="text-2xl font-bold text-green-800 dark:text-green-400">
+              <h1 className="text-lg sm:text-2xl font-bold text-green-800 dark:text-green-400 truncate max-w-[150px] sm:max-w-none">
                 {company.name}
               </h1>
-              <p className="text-sm text-muted-foreground">Partner Dashboard</p>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Partner Dashboard</p>
             </div>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
+          <Button variant="outline" onClick={handleLogout} size="sm" className="sm:size-default">
+            <LogOut className="mr-0 sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Logout</span>
           </Button>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-5">
-            <TabsTrigger value="overview">
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Overview
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 max-w-full md:max-w-2xl">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">
+              <LayoutDashboard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Overview</span>
+              <span className="sm:hidden">Home</span>
             </TabsTrigger>
-            <TabsTrigger value="rewards">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Rewards
+            <TabsTrigger value="rewards" className="text-xs sm:text-sm">
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Rewards</span>
+              <span className="sm:hidden">Cash</span>
             </TabsTrigger>
-            <TabsTrigger value="branding">
-              <Settings className="h-4 w-4 mr-2" />
-              Branding
+            <TabsTrigger value="branding" className="text-xs sm:text-sm">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Branding</span>
+              <span className="sm:hidden">Brand</span>
             </TabsTrigger>
-            <TabsTrigger value="locations">
-              <MapPin className="h-4 w-4 mr-2" />
-              Locations
+            <TabsTrigger value="locations" className="text-xs sm:text-sm">
+              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Locations</span>
+              <span className="sm:hidden">Bins</span>
             </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings className="h-4 w-4 mr-2" />
+            <TabsTrigger value="settings" className="text-xs sm:text-sm col-span-2 sm:col-span-1">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Settings
             </TabsTrigger>
           </TabsList>
