@@ -106,14 +106,14 @@ const CompanyRegister = () => {
         <Card className="max-w-2xl mx-auto shadow-lg">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="rounded-2xl bg-green-100 dark:bg-green-900 p-4">
-                <Building2 className="h-10 w-10 text-green-600 dark:text-green-400" />
+              <div className="rounded-2xl bg-green-100 dark:bg-green-900 p-3 sm:p-4">
+                <Building2 className="h-8 w-8 sm:h-10 sm:w-10 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <CardTitle className="text-3xl text-green-800 dark:text-green-400">
+            <CardTitle className="text-2xl sm:text-3xl text-green-800 dark:text-green-400">
               Partner Registration
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               Join Trashformer and transform your waste management
             </CardDescription>
           </CardHeader>

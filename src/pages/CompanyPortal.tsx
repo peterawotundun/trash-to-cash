@@ -164,17 +164,17 @@ const CompanyPortal = () => {
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {company.logo_url ? (
-              <img src={company.logo_url} alt={company.name} className="h-10 w-auto" />
+              <img src={company.logo_url} alt={company.name} className="h-8 sm:h-10 w-auto" />
             ) : (
-              <Recycle className="h-8 w-8" style={{ color: brandColors.primary }} />
+              <Recycle className="h-6 w-6 sm:h-8 sm:w-8" style={{ color: brandColors.primary }} />
             )}
             <div>
-              <h1 className="text-2xl font-bold" style={{ color: brandColors.primary }}>
+              <h1 className="text-lg sm:text-2xl font-bold truncate max-w-[150px] sm:max-w-none" style={{ color: brandColors.primary }}>
                 {company.name}
               </h1>
-              <p className="text-sm text-muted-foreground">Rewards Portal</p>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Rewards Portal</p>
             </div>
           </div>
           {!profile && (
@@ -182,6 +182,7 @@ const CompanyPortal = () => {
               onClick={() => navigate("/auth")}
               style={{ backgroundColor: brandColors.primary }}
               className="hover:opacity-90"
+              size="sm"
             >
               Sign In
             </Button>

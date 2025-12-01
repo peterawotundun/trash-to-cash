@@ -19,14 +19,16 @@ const Index = () => {
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="rounded-lg bg-green-600 p-2">
-                <Recycle className="h-6 w-6 text-white" />
+                <Recycle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-green-800 dark:text-green-400">
+              <span className="text-lg sm:text-2xl font-bold text-green-800 dark:text-green-400">
                 Trashformer
               </span>
             </div>
+            
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-6">
               <button 
                 onClick={() => scrollToSection("about")}
@@ -54,6 +56,15 @@ const Index = () => {
                 Get Started
               </Button>
             </div>
+            
+            {/* Mobile Get Started Button */}
+            <Button 
+              size="sm"
+              className="md:hidden bg-green-600 hover:bg-green-700"
+              onClick={() => navigate("/company-auth")}
+            >
+              Get Started
+            </Button>
           </div>
         </div>
       </nav>
@@ -61,31 +72,31 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-background dark:via-green-950/50 dark:to-background">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="container mx-auto px-4 py-24 md:py-32 text-center relative">
-          <div className="flex justify-center mb-8 animate-fade-in">
-            <div className="rounded-2xl bg-gradient-to-br from-green-500 to-green-700 p-8 shadow-2xl shadow-green-500/20">
-              <Recycle className="h-20 w-20 text-white" />
+        <div className="container mx-auto px-4 py-16 sm:py-24 md:py-32 text-center relative">
+          <div className="flex justify-center mb-6 sm:mb-8 animate-fade-in">
+            <div className="rounded-2xl bg-gradient-to-br from-green-500 to-green-700 p-6 sm:p-8 shadow-2xl shadow-green-500/20">
+              <Recycle className="h-16 w-16 sm:h-20 sm:w-20 text-white" />
             </div>
           </div>
-          <h1 className="mb-6 text-4xl md:text-6xl font-bold tracking-tight text-foreground animate-fade-in">
+          <h1 className="mb-4 sm:mb-6 text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-foreground animate-fade-in px-2">
             Revolutionizing Waste Sorting with{" "}
             <span className="text-green-600 dark:text-green-400">Smart Automation</span>
           </h1>
-          <p className="mx-auto mb-10 max-w-3xl text-lg md:text-xl text-muted-foreground animate-fade-in leading-relaxed">
+          <p className="mx-auto mb-8 sm:mb-10 max-w-3xl text-base sm:text-lg md:text-xl text-muted-foreground animate-fade-in leading-relaxed px-4">
             Empowering recycling companies with AI-powered waste sorting, real-time tracking, and data-driven insights — for a cleaner, smarter future.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 animate-fade-in px-4">
             <Button 
               size="lg" 
               variant="outline" 
               onClick={() => scrollToSection("how-it-works")}
-              className="text-base"
+              className="text-base w-full sm:w-auto"
             >
               Learn More
             </Button>
             <Button 
               size="lg" 
-              className="gap-2 bg-green-600 hover:bg-green-700 text-base"
+              className="gap-2 bg-green-600 hover:bg-green-700 text-base w-full sm:w-auto"
               onClick={() => navigate("/company-auth")}
             >
               Partner With Us
